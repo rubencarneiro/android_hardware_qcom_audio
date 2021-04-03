@@ -382,7 +382,7 @@ int voice_set_volume(struct audio_device *adev, float volume)
         } else if (volume > 1.0) {
             volume = 1.0;
         }
-
+    if (volume != 0.0) {
         vol = lrint(volume * 100.0);
 
         // Voice volume levels from android are mapped to driver volume levels as follows.
@@ -390,7 +390,13 @@ int voice_set_volume(struct audio_device *adev, float volume)
         // So adjust the volume to get the correct volume index in driver
         vol = 100 - vol;
 
+        err = platform_set_device_mute(adev->platform, false, "tx");
+        if (err)
+            return err;
         err = platform_set_voice_volume(adev->platform, vol);
+        } else {
+            err = platform_set_device_mute(adev->platform, true, "rx");
+        }
     }
 
     return err;
