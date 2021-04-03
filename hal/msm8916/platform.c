@@ -327,7 +327,7 @@ static int acdb_device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_OUT_SPEAKER_SAFE_AND_BT_A2DP] = 14,
     [SND_DEVICE_OUT_VOICE_TTY_FULL_HEADPHONES] = 17,
     [SND_DEVICE_OUT_VOICE_TTY_VCO_HEADPHONES] = 17,
-    [SND_DEVICE_OUT_VOICE_TTY_HCO_HANDSET] = 37,
+    [SND_DEVICE_OUT_VOICE_TTY_HCO_HANDSET] = 14,
     [SND_DEVICE_OUT_VOICE_TX] = 45,
     [SND_DEVICE_OUT_VOICE_MUSIC_TX] = 3,
     [SND_DEVICE_OUT_AFE_PROXY] = 0,
@@ -340,7 +340,7 @@ static int acdb_device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_OUT_VOICE_SPEAKER_PROTECTED] = 101,
     [SND_DEVICE_OUT_VOICE_SPEAKER_HFP] = 140,
 
-    [SND_DEVICE_IN_HANDSET_MIC] = 4,
+    [SND_DEVICE_IN_HANDSET_MIC] = 14,
     [SND_DEVICE_IN_HANDSET_MIC_EXTERNAL] = 4,
     [SND_DEVICE_IN_HANDSET_MIC_AEC] = 106,
     [SND_DEVICE_IN_HANDSET_MIC_NS] = 107,
@@ -359,7 +359,7 @@ static int acdb_device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_SPEAKER_DMIC_AEC_NS] = 117,
     [SND_DEVICE_IN_HEADSET_MIC] = 8,
     [SND_DEVICE_IN_HEADSET_MIC_FLUENCE] = 47,
-    [SND_DEVICE_IN_VOICE_SPEAKER_MIC] = 11,
+    [SND_DEVICE_IN_VOICE_SPEAKER_MIC] = 19,
     [SND_DEVICE_IN_VOICE_HEADSET_MIC] = 8,
     [SND_DEVICE_IN_HDMI_MIC] = 4,
     [SND_DEVICE_IN_BT_SCO_MIC] = 21,
@@ -372,7 +372,7 @@ static int acdb_device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_VOICE_SPEAKER_DMIC] = 43,
     [SND_DEVICE_IN_VOICE_SPEAKER_QMIC] = 19,
     [SND_DEVICE_IN_VOICE_TTY_FULL_HEADSET_MIC] = 16,
-    [SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC] = 36,
+    [SND_DEVICE_IN_VOICE_TTY_VCO_HANDSET_MIC] = 19,
     [SND_DEVICE_IN_VOICE_TTY_HCO_HEADSET_MIC] = 16,
     [SND_DEVICE_IN_VOICE_REC_MIC] = 4,
     [SND_DEVICE_IN_VOICE_REC_MIC_NS] = 107,
@@ -1652,6 +1652,7 @@ int platform_set_voice_volume(void *platform, int volume)
     struct mixer_ctl *ctl;
     const char *mixer_ctl_name = "Voice Rx Gain";
     int vol_index = 0, ret = 0;
+    float gain_factor;
     uint32_t set_values[ ] = {0,
                               ALL_SESSION_VSID,
                               DEFAULT_VOLUME_RAMP_DURATION_MS};
@@ -1659,7 +1660,8 @@ int platform_set_voice_volume(void *platform, int volume)
     // Voice volume levels are mapped to adsp volume levels as follows.
     // 100 -> 5, 80 -> 4, 60 -> 3, 40 -> 2, 20 -> 1  0 -> 0
     // But this values don't changed in kernel. So, below change is need.
-    vol_index = (int)percent_to_index(volume, MIN_VOL_INDEX, my_data->max_vol_index);
+    gain_factor = ((float)volume)/100.0f;
+    vol_index = (int)(5.0f * gain_factor);
     set_values[0] = vol_index;
 
     ctl = mixer_get_ctl_by_name(adev->mixer, mixer_ctl_name);
