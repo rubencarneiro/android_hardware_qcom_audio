@@ -4695,7 +4695,7 @@ static void adev_close_output_stream(struct audio_hw_device *dev __unused,
     }
 
     out->a2dp_compress_mute = false;
-
+    
     if (adev->primary_output == out)
         adev->primary_output == NULL;
 

@@ -225,9 +225,11 @@ enum {
 #define MIXER_PATH_MAX_LENGTH 100
 
 #define ACDB_ID_VOICE_SPEAKER 15
-#define ACDB_ID_VOICE_HANDSET 7
-#define ACDB_ID_VOICE_HANDSET_TMUS 88
+#define ACDB_ID_VOICE_HANDSET 10
+#define ACDB_ID_VOICE_HANDSET_TMUS 98
 #define ACDB_ID_VOICE_DMIC_EF_TMUS 89
+#define ACDB_ID_HANDSET_DMIC_AEC_NS 111
+#define ACDB_ID_SPEAKER_DMIC_AEC_NS 117
 #define ACDB_ID_HEADSET_MIC_AEC 8
 #define ACDB_ID_VOICE_REC_MIC 62
 
@@ -405,6 +407,6 @@ typedef struct codec_backend_cfg {
     char     *channels_mixer_ctl;
 } codec_backend_cfg_t;
 
-#define PLATFORM_INFO_XML_PATH          "audio_platform_info_intcodec_s4.xml"
+#define PLATFORM_INFO_XML_PATH          "/vendor/etc/audio_platform_info_intcodec_s4.xml"
 #define PLATFORM_INFO_XML_BASE_STRING   "audio_platform_info"
 #endif // QCOM_AUDIO_PLATFORM_H
