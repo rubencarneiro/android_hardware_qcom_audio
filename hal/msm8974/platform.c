@@ -37,6 +37,10 @@
 #include "maxxaudio.h"
 #include <resolv.h>
 
+#if defined (PLATFORM_SDM710)
+#define SDM_710_MIXER_XML_PATH "mixer_paths_intcodec_s4.xml"
+#define SDM_710_SND_CARD_NAME "sdm670-intcodec-s4-snd-card"
+#endif
 #define MIXER_XML_DEFAULT_PATH "mixer_paths.xml"
 #define MIXER_XML_BASE_STRING "mixer_paths"
 #define TOMTOM_8226_SND_CARD_NAME "msm8226-tomtom-snd-card"
@@ -2438,9 +2442,8 @@ int platform_set_voice_volume(void *platform, int volume)
     struct audio_device *adev = my_data->adev;
     struct mixer_ctl *ctl;
     const char *mixer_ctl_name = "Voice Rx Gain";
-    const char *mute_mixer_ctl_name = "Voice Rx Device Mute";
     int vol_index = 0, ret = 0;
-    uint32_t set_values[ ] = {0,
+    long int set_values[ ] = {0,
                               ALL_SESSION_VSID,
                               DEFAULT_VOLUME_RAMP_DURATION_MS};
 
@@ -2456,34 +2459,6 @@ int platform_set_voice_volume(void *platform, int volume)
               __func__, mixer_ctl_name);
         return -EINVAL;
     }
-    ALOGV("Setting voice volume index: %d", set_values[0]);
-    mixer_ctl_set_array(ctl, set_values, ARRAY_SIZE(set_values));
-
-    // Send mute command in case volume index is max since indexes are inverted
-    // for mixer controls.
-    if (vol_index == my_data->max_vol_index) {
-        set_values[0] = 1;
-    }
-    else {
-        set_values[0] = 0;
-    }
-
-    ctl = mixer_get_ctl_by_name(adev->mixer, mute_mixer_ctl_name);
-    if (!ctl) {
-        ALOGE("%s: Could not get ctl for mixer cmd - %s",
-              __func__, mute_mixer_ctl_name);
-        return -EINVAL;
-    }
-    ALOGV("%s: Setting RX Device Mute to: %d", __func__, set_values[0]);
-    mixer_ctl_set_array(ctl, set_values, ARRAY_SIZE(set_values));
-
-    if (my_data->csd != NULL) {
-        ret = my_data->csd->volume(ALL_SESSION_VSID, volume,
-                                   DEFAULT_VOLUME_RAMP_DURATION_MS);
-        if (ret < 0) {
-            ALOGE("%s: csd_volume error %d", __func__, ret);
-        }
-    }
     return ret;
 }
 
@@ -2494,7 +2469,7 @@ int platform_set_mic_mute(void *platform, bool state)
     struct mixer_ctl *ctl;
     const char *mixer_ctl_name = "Voice Tx Mute";
     int ret = 0;
-    uint32_t set_values[ ] = {0,
+    long int set_values[ ] = {0,
                               ALL_SESSION_VSID,
                               DEFAULT_MUTE_RAMP_DURATION_MS};
 
@@ -2532,7 +2507,7 @@ int platform_set_device_mute(void *platform, bool state, char *dir)
     struct mixer_ctl *ctl;
     char *mixer_ctl_name = NULL;
     int ret = 0;
-    uint32_t set_values[ ] = {0,
+    long int set_values[ ] = {0,
                               ALL_SESSION_VSID,
                               0};
     if(dir == NULL) {
